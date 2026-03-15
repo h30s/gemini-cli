@@ -148,6 +148,11 @@ export * from './ide/types.js';
 export * from './services/shellExecutionService.js';
 export * from './services/sandboxManager.js';
 
+// Sandbox Driver Architecture
+export * from './services/sandboxDriver.js';
+export * from './services/sandboxDriverRegistry.js';
+export * from './services/sandboxLifecycleManager.js';
+
 // Export base tool definitions
 export * from './tools/tools.js';
 export * from './tools/tool-error.js';

@@ -2700,8 +2700,15 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
           command: {
             type: 'string',
             description:
-              'The sandbox command to use (docker, podman, sandbox-exec, runsc, lxc).',
-            enum: ['docker', 'podman', 'sandbox-exec', 'runsc', 'lxc'],
+              'The sandbox command to use (docker, podman, sandbox-exec, runsc, lxc, appcontainer).',
+            enum: [
+              'docker',
+              'podman',
+              'sandbox-exec',
+              'runsc',
+              'lxc',
+              'appcontainer',
+            ],
           },
           image: {
             type: 'string',

@@ -25,7 +25,10 @@ import {
   FatalSandboxError,
   GEMINI_DIR,
   homedir,
+  SandboxDriverRegistry,
+  SandboxLifecycleManager,
 } from '@google/gemini-cli-core';
+import { registerBuiltinDrivers } from '../sandbox/drivers/index.js';
 import { ConsolePatcher } from '../ui/utils/ConsolePatcher.js';
 import { randomBytes } from 'node:crypto';
 import {
@@ -43,6 +46,17 @@ import {
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
+// Singleton registry for sandbox drivers (created once on first call)
+let _registry: SandboxDriverRegistry | undefined;
+
+function getGlobalRegistry(): SandboxDriverRegistry {
+  if (!_registry) {
+    _registry = new SandboxDriverRegistry();
+    registerBuiltinDrivers(_registry);
+  }
+  return _registry;
+}
+
 export async function start_sandbox(
   config: SandboxConfig,
   nodeArgs: string[] = [],
@@ -56,6 +70,26 @@ export async function start_sandbox(
   patcher.patch();
 
   try {
+    // NEW: Try driver architecture first
+    const registry = getGlobalRegistry();
+    const driver = await registry.resolve(config);
+
+    if (driver && driver.name !== 'noop') {
+      const manager = new SandboxLifecycleManager(driver);
+      await manager.initialize(config);
+      return await manager.execute({
+        config,
+        nodeArgs,
+        cliArgs,
+        workdir: path.resolve(process.cwd()),
+        cliConfig,
+      });
+    }
+
+    // FALLBACK: Existing code paths for unmigrated drivers (LXC)
+    // and any config that the registry couldn't resolve.
+    // This block shrinks as drivers are extracted and will eventually be removed.
+
     if (config.command === 'sandbox-exec') {
       // disallow BUILD_SANDBOX
       if (process.env['BUILD_SANDBOX']) {

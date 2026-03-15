@@ -29,6 +29,7 @@ const VALID_SANDBOX_COMMANDS = [
   'sandbox-exec',
   'runsc',
   'lxc',
+  'appcontainer',
 ];
 
 function isSandboxCommand(
