@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gemini CLI Behavior Taxonomy",
+  "description": "Schema for validating behaviors.taxonomy.json",
+  "type": "object",
+  "required": ["version", "categories"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the taxonomy"
+    },
+    "description": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "object",
+      "description": "Map of category name to category definition",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "behaviors"],
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "behaviors": {
+            "type": "object",
+            "description": "Map of behavior name to behavior definition",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "required": ["tag", "criticality", "description"],
+              "additionalProperties": false,
+              "properties": {
+                "tag": {
+                  "type": "string",
+                  "pattern": "^[a-z_]+\\.[a-z_]+$",
+                  "description": "Dot-separated behavior tag in the form category.behavior_name"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "criticality": {
+                  "type": "string",
+                  "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+                },
+                "example_prompts": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                },
+                "existing_evals": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
